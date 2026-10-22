@@ -228,6 +228,27 @@ class BuildTests(unittest.TestCase):
         errors, _ = model.validate(saved, self.root)
         self.assertFalse(errors)
 
+    def test_stale_scope_only_rewrites_the_changed_node(self) -> None:
+        write(self.root / "src" / "chat" / "index.ts", "export const chat = 1\n")
+        write(self.root / "src" / "chat" / "Chat.tsx", "export const Chat = () => null\n")
+        write(self.root / "src" / "chat" / "api.ts", "export const api = 1\n")
+        write(self.root / "src" / "settings" / "index.ts", "export const settings = 1\n")
+        write(self.root / "src" / "settings" / "Settings.tsx", "export const Settings = () => null\n")
+        write(self.root / "src" / "settings" / "api.ts", "export const api = 1\n")
+        facts.scan(self.root)
+        draft = structure.propose(model.read_json(model.facts_path(self.root)), self.root)
+        ids = {node["id"] for node in draft["nodes"]}
+        self.assertGreaterEqual(len(ids), 2)
+        plan = build.plan(self.root, draft, model.read_json(model.facts_path(self.root)), "all", build.BuildConfig())
+        build.build(self.root, llm=self._fake(), scope="all", confirm=plan["hash"])
+
+        write(self.root / "src" / "chat" / "index.ts", "export const chat = 2\n")
+        updated_plan = build.plan(self.root, model.load_tree(self.root), model.read_json(model.facts_path(self.root)), "stale", build.BuildConfig())
+        self.assertEqual(len(updated_plan["nodes"]), 1)
+        result = build.build(self.root, llm=self._fake("changed"), scope="stale")
+        self.assertEqual(result["updated"], ["chat"])
+        self.assertTrue((self.root / ".atlas" / "changelog.md").exists())
+
     def test_locked_node_is_never_rewritten(self) -> None:
         facts.scan(self.root)
         tree = structure.propose(model.read_json(model.facts_path(self.root)), self.root)

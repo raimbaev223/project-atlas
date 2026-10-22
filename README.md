@@ -149,7 +149,7 @@ they are not silently attached.
 ## Development
 
 ```bash
-python -m unittest discover -s tests -v      # 10 deterministic tests, no model
+python -m unittest discover -s tests -v      # 11 deterministic tests, no model
 python -m atlas_core.cli scan -p ~/some/repo
 python -m atlas_core.cli draft -p ~/some/repo
 hermes atlas build -p ~/some/repo --scope node:core   # uses ctx.llm
