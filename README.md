@@ -50,6 +50,12 @@ hermes plugins install raimbaev223/project-atlas
 hermes plugins enable atlas
 ```
 
+For a reproducible install, pin the commit:
+
+```bash
+hermes plugins install raimbaev223/project-atlas --ref ff6b422e001d51f75f87e5dc33bcd3734c17219c
+```
+
 With a named profile, add `-p <profile>` to both commands. The desktop half is
 copied from the installed package into `~/.hermes/desktop-plugins/atlas/` by the
 app on its next scan (or **Capabilities → Plugins → Rescan**).
