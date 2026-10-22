@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/raimbaev223/project-atlas/raw/main/atlas_core/schema.json",
+  "title": "Project Atlas tree",
+  "description": "Human-readable map of a project: one YAML file, no pages on disk.",
+  "type": "object",
+  "required": ["version", "project", "generated", "nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "project": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "generated": { "type": "string", "minLength": 10, "maxLength": 40 },
+    "generator": { "type": "string", "maxLength": 80 },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 400,
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "orphans": {
+      "type": "array",
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/orphan" }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^(?!root$)[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id", "name", "parent", "kind", "summary", "status",
+        "confidence", "locked", "paths", "sourceHash"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "parent": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "string", "const": "root" },
+            { "type": "null" }
+          ]
+        },
+        "kind": {
+          "enum": ["ui", "service", "runtime", "interface", "data", "infra", "library", "tool", "other"]
+        },
+        "kindNote": { "type": "string", "maxLength": 120 },
+        "summary": { "type": "string", "maxLength": 240 },
+        "overview": { "type": "string", "maxLength": 8000 },
+        "status": { "enum": ["full", "partial", "none"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "locked": { "type": "boolean" },
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 40,
+          "items": { "$ref": "#/$defs/path" }
+        },
+        "sourceHash": { "type": "string", "pattern": "^[0-9a-f]{12}$" },
+        "decisions": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/decision" }
+        },
+        "links": {
+          "type": "array",
+          "maxItems": 40,
+          "items": { "$ref": "#/$defs/link" }
+        },
+        "todo": {
+          "type": "array",
+          "maxItems": 40,
+          "items": { "type": "string", "maxLength": 300 }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "required": ["title", "why"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "why": { "type": "string", "minLength": 1, "maxLength": 600 },
+        "evidence": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "type": "string", "maxLength": 200 }
+        }
+      }
+    },
+    "link": {
+      "type": "object",
+      "required": ["to", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "to": { "$ref": "#/$defs/id" },
+        "type": { "type": "string", "minLength": 1, "maxLength": 40 }
+      }
+    },
+    "orphan": {
+      "type": "object",
+      "required": ["path"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "files": { "type": "integer", "minimum": 0 },
+        "suggestParent": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "string", "const": "root" },
+            { "type": "null" }
+          ]
+        },
+        "reason": { "type": "string", "maxLength": 240 }
+      }
+    }
+  }
+}

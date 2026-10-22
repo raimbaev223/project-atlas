@@ -1,0 +1,44 @@
+name: atlas
+version: 0.1.0
+description: >
+  Project Atlas builds a code-derived map of any project: a deterministic scanner
+  collects evidence, one structured model call per node writes .atlas/atlas.yaml,
+  and the desktop page renders a zoomable skill tree plus a documentation tab from
+  that single file. The project's code is only read; Atlas writes inside .atlas/.
+author: Erkin
+license: MIT
+homepage: https://github.com/raimbaev223/project-atlas
+tags: [documentation, knowledge-base, code-map, project-map, atlas]
+manifest_version: 2
+api_version: 1
+requires_hermes: ">=0.21.5"
+
+provides_tools:
+  - atlas_scan
+  - atlas_plan
+  - atlas_build
+  - atlas_status
+
+config_schema:
+  max_files_per_node:
+    type: int
+    default: 10
+    label: Files per node
+    description: How many code files the agent reads for one node.
+  max_node_chars:
+    type: int
+    default: 24000
+    label: Evidence budget per node (characters)
+    description: Hard cap on the code excerpt sent to the model for one node.
+  max_branches:
+    type: int
+    default: 8
+    label: Top-level branches
+    description: More parts than this are grouped under one node.
+  max_nodes_per_run:
+    type: int
+    default: 40
+    label: Nodes per build
+    description: Safety cap for a single generation run.
+
+capabilities: []

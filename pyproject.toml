@@ -1,0 +1,11 @@
+[project]
+name = "project-atlas"
+version = "0.1.0"
+description = "Project Atlas — a code-derived knowledge base and skill tree for any project, inside Hermes"
+requires-python = ">=3.11"
+dependencies = [
+    "ruamel.yaml>=0.17,<0.19",
+]
+
+[project.urls]
+Homepage = "https://github.com/raimbaev223/project-atlas"
